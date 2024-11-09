@@ -6,13 +6,24 @@ on:
       - demo-page
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   release-page:
     runs-on: ubuntu-latest
+    environment:
+        name: github-pages
+        url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
       - uses: oven-sh/setup-bun@v2
       - uses: actions/cache@v3
         with:
@@ -20,9 +31,11 @@ jobs:
           path: ~/.bun/install/cache
       - run: bun install
       - run: bun astro build
-      - run: |
-            git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git config --global user.name "github-actions[bot]"
-            git add -f ./dist
-            git commit -n -m "chore: upgrade static files"
-            git push
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: './dist'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
