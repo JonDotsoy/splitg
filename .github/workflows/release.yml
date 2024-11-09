@@ -21,4 +21,5 @@ jobs:
       - run: bun install
       - run: bun astro build
       - run: |
-            git add -f dist && git commit -n -m \"chore: upgrade static files\"
+            git add -f ./dist
+            git commit -n -m \"chore: upgrade static files\"
