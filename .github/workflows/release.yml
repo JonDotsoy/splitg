@@ -13,7 +13,7 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - uses: actions/cache@v3
         with:
-          key: bun-install-cache-${{ runner.arch }}-${{ runner.os }}
+          key: bun-install-cache-${{ runner.arch }}-${{ runner.os }}-${{ github.workflow }}
           path: ~/.bun/install/cache
       - run: bun install
       - run: bun astro build
