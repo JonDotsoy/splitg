@@ -1,9 +1,29 @@
 {
-  "name": "splitg",
+  "name": "@jondotsoy/splitg",
+  "version": "0.0.0",
   "module": "src/index.ts",
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./lib/esm/*.d.ts"
+      ]
+    }
+  },
+  "exports": {
+    ".": {
+      "require": "./lib/esm/index.js",
+      "import": "./lib/esm/index.js",
+      "types": "./lib/esm/index.d.ts"
+    }
+  },
   "scripts": {
-    "fmt": "prettier -w ."
+    "prepack": "tsc -p tsconfig.esm.json --outDir ./lib/esm",
+    "lint": "prettier --check .",
+    "fmt": "prettier --write ."
   },
   "devDependencies": {
     "@types/bun": "^1.1.13"
@@ -12,5 +32,7 @@
     "typescript": "^5.6.3",
     "prettier": "^3.3.3"
   },
-  "version": "0.2.0"
+  "files": [
+    "lib"
+  ]
 }
