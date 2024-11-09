@@ -25,3 +25,4 @@ jobs:
             git config --global user.name "github-actions[bot]"
             git add -f ./dist
             git commit -n -m "chore: upgrade static files"
+            git push
