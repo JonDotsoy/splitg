@@ -11,6 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
+      - uses: actions/cache@v3
+        with:
+            key: key
+            path: ~/.bun/install/cache
       - run: bun install
       - name: Lint
         run: bun lint
