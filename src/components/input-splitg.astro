@@ -10,6 +10,24 @@ const samples = [
 <script>
     import { splitg } from "@jondotsoy/splitg";
 
+    function getQuerySearchQ() {
+        try {
+            return new URL(globalThis.location.href).searchParams.get("q");
+        } catch {
+            return null;
+        }
+    }
+
+    function setQuerySearchQ(value: string) {
+        try {
+            const newURL = new URL(globalThis.location.href);
+            newURL.searchParams.set("q", value);
+
+            console.log("🚀 ~ setQuerySearchQ ~ newURL:", newURL)
+            globalThis.history.pushState({}, "", newURL);
+        } catch {}
+    }
+
     class Selector {
         constructor(
             readonly context: HTMLElement,
@@ -66,6 +84,8 @@ const samples = [
         input = new Selector(this, "input");
 
         connectedCallback() {
+            const initialValue = getQuerySearchQ();
+            if (initialValue) this.input.setValue(initialValue);
             this.input.addOnChangeEventListener((event) => {
                 event.preventDefault();
                 this.evaluate(this.input.getValue() ?? "");
@@ -84,10 +104,17 @@ const samples = [
             const parts = splitg(value);
             this.showResult.setTextContent(JSON.stringify(parts, null, 2));
             this.jsSample.setTextContent(
-                'import { splitg } from "@jondotsoy/splitg";\n\n'+
-                `const parts = splitg(${JSON.stringify(value)})\n`+
-                JSON.stringify(parts, null, 2).split('\n').map((line,index) => `//${index===0?' => ':' '}${line}\n`).join('')
-            )
+                'import { splitg } from "@jondotsoy/splitg";\n\n' +
+                    `const parts = splitg(${JSON.stringify(value)})\n` +
+                    JSON.stringify(parts, null, 2)
+                        .split("\n")
+                        .map(
+                            (line, index) =>
+                                `//${index === 0 ? " => " : " "}${line}\n`,
+                        )
+                        .join(""),
+            );
+            setQuerySearchQ(value);
         }
     }
 
