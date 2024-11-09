@@ -17,7 +17,16 @@ jobs:
             path: ~/.bun/install/cache
       - run: bun install
       - name: Lint
-        run: bun lint
+        run: |
+          bun lint 2&> /tmp/lint_report || touch /tmp/lint_report_fail
+          if [[ -f /tmp/lint_report_fail ]]; then
+            echo "## Error Lint" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "```" >> $GITHUB_STEP_SUMMARY
+            cat /tmp/lint_report >> $GITHUB_STEP_SUMMARY
+            echo "```" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
 
   release:
     needs: lint
