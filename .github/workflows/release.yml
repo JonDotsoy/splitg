@@ -8,3 +8,8 @@ on:
 jobs:
   release:
     uses: jondotsoy/jondotsoy/.github/workflows/bun-release-package.yml@v1
+    secrets:
+        NPM_TOKEN: true
+    permissions:
+      contents: write
+      pull-requests: write
