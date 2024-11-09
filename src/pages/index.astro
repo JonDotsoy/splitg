@@ -1,4 +1,6 @@
 ---
+import InputSplitg from "../components/input-splitg.astro";
+
 
 ---
 
@@ -8,9 +10,21 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>Demo splitg</title>
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<div class="grid grid-rows-[auto_1fr_auto] h-screen gap-2">
+			<header>
+				<!-- <h1>splitg</h1> -->
+			</header>
+			<body>
+				<div class="w-full max-w-screen-md mx-auto px-2">
+					<InputSplitg></InputSplitg>
+				</div>
+			</body>
+			<footer>
+				<!-- <footer>footer</footer> -->
+			</footer>
+		</div>
 	</body>
 </html>

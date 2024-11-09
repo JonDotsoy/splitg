@@ -1,0 +1,138 @@
+---
+const samples = [
+    "Hello World!",
+    "find this [site: sample.com]",
+    "podman run [options] IMAGE [COMMAND [ARG...]]",
+    "docker run [OPTIONS] IMAGE [COMMAND] [ARG...]",
+];
+---
+
+<script>
+    import { splitg } from "@jondotsoy/splitg";
+
+    class Selector {
+        constructor(
+            readonly context: HTMLElement,
+            readonly selector: string,
+        ) {}
+
+        private node() {
+            const node = this.context.querySelector(
+                `[x-selector=${JSON.stringify(this.selector)}]`,
+            );
+            return node;
+        }
+
+        private nodeInput() {
+            const node = this.node();
+            if (!(node instanceof HTMLInputElement)) return null;
+            return node;
+        }
+
+        addOnChangeEventListener(listener: (event: Event) => void) {
+            this.nodeInput()?.addEventListener("change", listener);
+            this.nodeInput()?.addEventListener("keyup", listener);
+            return () => {
+                this.nodeInput()?.removeEventListener("change", listener);
+                this.nodeInput()?.removeEventListener("keyup", listener);
+            };
+        }
+
+        getValue() {
+            return this.nodeInput()?.value;
+        }
+
+        setValue(value: string) {
+            const node = this.nodeInput();
+            if (!node) return;
+            node.value = value;
+        }
+
+        setInnerHTML(html: string) {
+            const node = this.node();
+            if (!node) return;
+            node.innerHTML = html;
+        }
+        setTextContent(html: string) {
+            const node = this.node();
+            if (!node) return;
+            node.textContent = html;
+        }
+    }
+
+    class InputSplitg extends HTMLElement {
+        showResult = new Selector(this, "showresult");
+        jsSample = new Selector(this, "jssample");
+        input = new Selector(this, "input");
+
+        connectedCallback() {
+            this.input.addOnChangeEventListener((event) => {
+                event.preventDefault();
+                this.evaluate(this.input.getValue() ?? "");
+            });
+            this.evaluate(this.input.getValue() ?? "");
+        }
+
+        disconnectedCallback() {}
+
+        setValue(value: string) {
+            this.input.setValue(value);
+            this.evaluate(value);
+        }
+
+        evaluate(value: string) {
+            const parts = splitg(value);
+            this.showResult.setTextContent(JSON.stringify(parts, null, 2));
+            this.jsSample.setTextContent(
+                'import { splitg } from "@jondotsoy/splitg";\n\n'+
+                `const parts = splitg(${JSON.stringify(value)})\n`+
+                JSON.stringify(parts, null, 2).split('\n').map((line,index) => `//${index===0?' => ':' '}${line}\n`).join('')
+            )
+        }
+    }
+
+    class SampleButton extends HTMLElement {
+        connectedCallback() {
+            const findParentInputSplitg = (
+                from: HTMLElement,
+            ): null | InputSplitg => {
+                if (from.parentElement instanceof InputSplitg)
+                    return from.parentElement;
+                if (from.parentElement)
+                    return findParentInputSplitg(from.parentElement);
+                return null;
+            };
+            const parentInputSplitg = findParentInputSplitg(this);
+
+            this.addEventListener("click", (event) => {
+                const textContent =
+                    event.currentTarget instanceof HTMLElement
+                        ? event.currentTarget.textContent
+                        : null;
+                if (textContent) parentInputSplitg?.setValue(textContent);
+            });
+        }
+    }
+
+    customElements.define("input-splitg", InputSplitg);
+    customElements.define("sample-button", SampleButton);
+</script>
+
+<input-splitg type="text">
+    <input
+        type="text"
+        x-selector="input"
+        placeholder="hello world!"
+        value="hello world!"
+        class="border px-4 py-2 rounded shadow w-full mb-1"
+    />
+    <div
+        class="mb-3 overflow-auto py-4 flex flex-row flex-nowrap gap-2 [&>sample-button]:border [&>sample-button]:text-sm [&>sample-button]:px-2 [&>sample-button]:py-0 rounded [&>sample-button]:bg-gray-100 [&>sample-button]:text-nowrap [&>sample-button]:cursor-pointer"
+    >
+        {samples.map((sample) => <sample-button>{sample}</sample-button>)}
+    </div>
+    <pre
+        class="px-4 py-2 mb-4 bg-gray-500 text-white border font-mono"><code x-selector="showresult" /></pre>
+    <pre
+        class="px-4 py-2 bg-gray-500 text-white border font-mono"><code x-selector="jssample" /></pre>
+</input-splitg>
