@@ -4,6 +4,7 @@ const samples: Array<{ value: string; delimiter?: string }> = [
   { value: "find this [site: sample.com]" },
   { value: "run --parem=$(other run)" },
   { value: "1,2,3,(4,5,6,7),8,9", delimiter: "," },
+  { value: `1,2,3,"4,5,6,7",8,9`, delimiter: "," },
   { value: "podman run [options] IMAGE [COMMAND [ARG...]]" },
   { value: "docker run [OPTIONS] IMAGE [COMMAND] [ARG...]" },
 ];
@@ -201,8 +202,7 @@ const samples: Array<{ value: string; delimiter?: string }> = [
     }
   </div>
   <div class="">
-    <pre
-      class="px-4 overflow-auto py-2 mb-4 bg-gray-500 text-white border font-mono"><code x-selector="showresult" /></pre>
+    <pre      class="px-4 overflow-auto py-2 mb-4 bg-gray-500 text-white border font-mono"><code x-selector="showresult" /></pre>
     <pre
       class="px-4 overflow-auto py-2 bg-gray-500 text-white border font-mono"><code x-selector="jssample" /></pre>
   </div>
