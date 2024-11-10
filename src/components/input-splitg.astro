@@ -1,9 +1,9 @@
 ---
-const samples: Array<{ value: string; delimitter?: string }> = [
+const samples: Array<{ value: string; delimiter?: string }> = [
   { value: "Hello World!" },
   { value: "find this [site: sample.com]" },
   { value: "run --parem=$(other run)" },
-  { value: "1,2,3,(4,5,6,7),8,9", delimitter: "," },
+  { value: "1,2,3,(4,5,6,7),8,9", delimiter: "," },
   { value: "podman run [options] IMAGE [COMMAND [ARG...]]" },
   { value: "docker run [OPTIONS] IMAGE [COMMAND] [ARG...]" },
 ];
@@ -106,9 +106,9 @@ const samples: Array<{ value: string; delimitter?: string }> = [
 
     connectedCallback() {
       const initialValue = getQuerySearchQ();
-      const initialDelimitter = getQuerySearchD();
+      const initialDelimiter = getQuerySearchD();
       if (initialValue) this.input.setValue(initialValue);
-      if (initialDelimitter) this.inputDelimiter.setValue(initialDelimitter);
+      if (initialDelimiter) this.inputDelimiter.setValue(initialDelimiter);
       this.input.addOnChangeEventListener((event) => {
         event.preventDefault();
         this.evaluate();
@@ -193,7 +193,7 @@ const samples: Array<{ value: string; delimitter?: string }> = [
       samples.map((sample) => (
         <sample-button
           data-value={sample.value}
-          data-delimiter={sample.delimitter}
+          data-delimiter={sample.delimiter}
         >
           {sample.value}
         </sample-button>
