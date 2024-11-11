@@ -28,8 +28,7 @@ const splitterOption: CharOption = {
   check: () => ({ split: true }),
 };
 
-/** @experimental */
-const escapeOption: CharOption = {
+const escapeOptions: CharOption = {
   check(_, leftIndex) {
     return {
       transformNextResultCheck: (resultCheck, index) => {
@@ -45,7 +44,7 @@ const escapeOption: CharOption = {
   },
 };
 
-const openBlockOption = (name: string): CharOption => ({
+const createOpenBlockOptions = (name: string): CharOption => ({
   check(ctx) {
     ctx.depths[name] ??= 0;
     ctx.depths[name] += 1;
@@ -53,7 +52,7 @@ const openBlockOption = (name: string): CharOption => ({
   },
 });
 
-const closeBlockOption = (name: string): CharOption => ({
+const createCloseBlockOptions = (name: string): CharOption => ({
   check(ctx) {
     ctx.depths[name] ??= 0;
     ctx.depths[name] -= 1;
@@ -63,7 +62,8 @@ const closeBlockOption = (name: string): CharOption => ({
   },
 });
 
-const quoteSymbolOption = (name: string): CharOption => ({
+/** @experimental */
+const createQuoteOptions = (name: string): CharOption => ({
   check: (ctx) => {
     if (ctx.splitBlocksKeys.has(name)) {
       ctx.splitBlocksKeys.delete(name);
@@ -80,7 +80,7 @@ export const defaultBlocks = [
   ["[", "]"],
   ["(", ")"],
 ];
-export const defaultQuoteSymbols: string[] = []; // ["'", '"'];
+export const defaultQuotes: string[] = []; // ["'", '"'];
 
 type Options = {
   splitters?: string[];
@@ -94,27 +94,27 @@ function* splitString(input: string, options?: Options) {
   const splitters = options?.splitters ?? defaultSplitters;
   const escapes = options?.escapes ?? defaultEscapes;
   const blocks = options?.brackets ?? defaultBlocks;
-  const quoteSymbols = options?.quotes ?? defaultQuoteSymbols;
+  const quotes = options?.quotes ?? defaultQuotes;
 
   const charOptions = {
     ...Object.fromEntries(
       splitters.map((splitter) => [splitter, splitterOption]),
     ),
     ...Object.fromEntries(
-      escapes?.map((escape) => [escape, escapeOption]) ?? [],
+      escapes?.map((escape) => [escape, escapeOptions]) ?? [],
     ),
     ...Object.fromEntries(
       blocks
         .map(([open, close]) => [
-          [open, openBlockOption(`${open}${close}`)],
-          [close, closeBlockOption(`${open}${close}`)],
+          [open, createOpenBlockOptions(`${open}${close}`)],
+          [close, createCloseBlockOptions(`${open}${close}`)],
         ])
         .flat(),
     ),
     ...Object.fromEntries(
-      quoteSymbols.map((quoteSymbol) => [
+      quotes.map((quoteSymbol) => [
         quoteSymbol,
-        quoteSymbolOption(quoteSymbol),
+        createQuoteOptions(quoteSymbol),
       ]),
     ),
   };
@@ -153,13 +153,47 @@ function* splitString(input: string, options?: Options) {
   yield input.slice(startFrom, index);
 }
 
-export function splitg(input: string, splitter?: string, options?: Options) {
-  return Array.from(
-    splitString(input, {
-      ...options,
+type SplitgOptions =
+  | []
+  | [splitterOrOptions?: string | Options]
+  | [splitter?: string, options?: Options];
+
+const parseSplitgOptions = (
+  ...options: SplitgOptions
+): { splitter?: string; options?: Options } => {
+  const [splitterOrOptions, optionsValue] = options;
+  if (typeof splitterOrOptions === "object")
+    return { options: splitterOrOptions };
+  if (typeof optionsValue === "object")
+    return {
+      splitter: splitterOrOptions,
+      options: optionsValue,
+    };
+  if (typeof splitterOrOptions === "string")
+    return {
+      splitter: splitterOrOptions,
+    };
+  return {};
+};
+
+export function splitgOptions(input: string, ...options: SplitgOptions) {
+  const { splitter, options: optionsValue } = parseSplitgOptions(...options);
+  return {
+    input: input,
+    options: {
+      ...optionsValue,
       splitters: splitter
-        ? [...(options?.splitters ?? []), splitter]
-        : options?.splitters,
-    }),
+        ? [splitter, ...(optionsValue?.splitters ?? [])]
+        : optionsValue?.splitters,
+    } as Options,
+  };
+}
+
+export function splitg(input: string, ...options: SplitgOptions) {
+  const { input: inputValue, options: optionsValue } = splitgOptions(
+    input,
+    ...options,
   );
+
+  return Array.from(splitString(inputValue, optionsValue));
 }
