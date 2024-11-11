@@ -28,6 +28,7 @@ const splitterOption: CharOption = {
   check: () => ({ split: true }),
 };
 
+/** @experimental */
 const escapeOption: CharOption = {
   check(_, leftIndex) {
     return {
@@ -85,6 +86,7 @@ type Options = {
   splitters?: string[];
   escapes?: string[];
   brackets?: [string, string][];
+  /** @experimental */
   quotes?: string[];
 };
 
