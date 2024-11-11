@@ -79,7 +79,7 @@ export const defaultBlocks = [
   ["[", "]"],
   ["(", ")"],
 ];
-export const defaultQuoteSymbols = ["'", '"'];
+export const defaultQuoteSymbols: string[] = []; // ["'", '"'];
 
 type Options = {
   splitters?: string[];
