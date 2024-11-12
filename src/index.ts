@@ -277,3 +277,5 @@ export function splitg(input: string, ...options: SplitgOptions) {
 
   return Array.from(splitString(inputValue, optionsValue));
 }
+
+export default splitg;
