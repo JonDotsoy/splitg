@@ -111,7 +111,7 @@ const createQuoteOptions = (name: string): CharOption => {
   };
 };
 
-const defaultOptions: Required<Options> = {
+export const defaultOptions: Required<Options> = {
   splitters: [" "],
   escapes: ["\\"],
   brackets: [
