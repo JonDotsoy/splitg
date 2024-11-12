@@ -1,8 +1,8 @@
 class Ctx {
-  depths: Record<string, number | undefined> = {};
-  splitBlocksKeys = new Set<string>();
+  bracketsDepths: string[] = [];
+  blocksKeys = new Set<string>();
   isSplitBlocked() {
-    return this.splitBlocksKeys.size > 0;
+    return this.blocksKeys.size > 0 || this.bracketsDepths.length;
   }
 }
 
@@ -59,21 +59,27 @@ const escapeOptions: CharOption = {
   },
 };
 
-const createOpenBlockOptions = (name: string): CharOption => ({
+const createOpenBlockOptions = (
+  name: string,
+  _open: string,
+  _close: string,
+): CharOption => ({
   check(ctx) {
-    ctx.depths[name] ??= 0;
-    ctx.depths[name] += 1;
-    ctx.splitBlocksKeys.add(name);
+    ctx.bracketsDepths.push(name);
   },
 });
 
-const createCloseBlockOptions = (name: string): CharOption => ({
+const createCloseBlockOptions = (
+  name: string,
+  _open: string,
+  _close: string,
+): CharOption => ({
   check(ctx) {
-    ctx.depths[name] ??= 0;
-    ctx.depths[name] -= 1;
-    if (ctx.depths[name] === 0) {
-      ctx.splitBlocksKeys.delete(name);
-    }
+    const index = ctx.bracketsDepths.findLastIndex(
+      (storeName) => storeName === name,
+    );
+    if (index === -1) return;
+    ctx.bracketsDepths = ctx.bracketsDepths.slice(0, index);
   },
 });
 
@@ -81,12 +87,12 @@ const createQuoteOptions = (name: string): CharOption => {
   const escapeSymbol = "\\";
   return {
     check: (ctx) => {
-      if (ctx.splitBlocksKeys.has(name)) {
-        ctx.splitBlocksKeys.delete(name);
+      if (ctx.blocksKeys.has(name)) {
+        ctx.blocksKeys.delete(name);
         return {};
       }
 
-      ctx.splitBlocksKeys.add(name);
+      ctx.blocksKeys.add(name);
 
       const transformNextBeforeCheck: TransformNextBeforeCheck = (
         next,
@@ -145,8 +151,8 @@ function* splitString(input: string, options?: Options) {
     ...Object.fromEntries(
       blocks
         .map(([open, close]) => [
-          [open, createOpenBlockOptions(`${open}${close}`)],
-          [close, createCloseBlockOptions(`${open}${close}`)],
+          [open, createOpenBlockOptions(`${open}${close}`, open, close)],
+          [close, createCloseBlockOptions(`${open}${close}`, open, close)],
         ])
         .flat(),
     ),
