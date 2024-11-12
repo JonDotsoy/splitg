@@ -19,7 +19,7 @@ splitg(
 // ]
 ```
 
-Try it here (https://jondotsoy.github.io/splitg/)[https://jondotsoy.github.io/splitg/]
+Try it here [https://jondotsoy.github.io/splitg/](https://jondotsoy.github.io/splitg/)
 
 ## Usage
 
