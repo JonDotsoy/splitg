@@ -77,7 +77,6 @@ const createCloseBlockOptions = (name: string): CharOption => ({
   },
 });
 
-/** @experimental */
 const createQuoteOptions = (name: string): CharOption => {
   const escapeSymbol = "\\";
   return {
@@ -112,28 +111,29 @@ const createQuoteOptions = (name: string): CharOption => {
   };
 };
 
-export const defaultSplitters = [" "];
-export const defaultEscapes = ["\\"];
-export const defaultBlocks = [
-  ["{", "}"],
-  ["[", "]"],
-  ["(", ")"],
-];
-export const defaultQuotes: string[] = []; // ["'", '"'];
+const defaultOptions: Required<Options> = {
+  splitters: [" "],
+  escapes: ["\\"],
+  brackets: [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"],
+  ],
+  quotes: ["'", '"'],
+};
 
 type Options = {
   splitters?: string[];
   escapes?: string[];
   brackets?: [string, string][];
-  /** @experimental */
   quotes?: string[];
 };
 
 function* splitString(input: string, options?: Options) {
-  const splitters = options?.splitters ?? defaultSplitters;
-  const escapes = options?.escapes ?? defaultEscapes;
-  const blocks = options?.brackets ?? defaultBlocks;
-  const quotes = options?.quotes ?? defaultQuotes;
+  const splitters = options?.splitters ?? defaultOptions.splitters;
+  const escapes = options?.escapes ?? defaultOptions.escapes;
+  const blocks = options?.brackets ?? defaultOptions.brackets;
+  const quotes = options?.quotes ?? defaultOptions.quotes;
 
   const charOptions = {
     ...Object.fromEntries(

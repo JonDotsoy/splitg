@@ -120,4 +120,18 @@ describe("quotes", () => {
       "6",
       "7",
     ]));
+
+  it("splits a string with spaces as separator, double quotes and escaped characters", () =>
+    expect(splitg(`a "b \\c d" e`, " ", { quotes: ['"'] })).toEqual([
+      "a",
+      `"b \\c d"`,
+      "e",
+    ]));
+
+  it("splits a string with spaces as separator, double quotes and newline characters", () =>
+    expect(splitg(`a "b \n d" e`, " ", { quotes: ['"'] })).toEqual([
+      "a",
+      `"b \n d"`,
+      "e",
+    ]));
 });
