@@ -9,7 +9,16 @@ class Ctx {
 export type TransformNextResultCheck = (
   a: ResultCheck,
   index: number,
+  char: string,
 ) => ResultCheck;
+
+export type TransformNextBeforeCheck = (
+  next: () => ResultCheck,
+  index: number,
+  char: string,
+  str: string,
+) => ResultCheck;
+
 export type ResultCheck = {
   /**
    * Cut here
@@ -17,10 +26,16 @@ export type ResultCheck = {
   split?: boolean;
   /**
    * Transform the next char
+   * @deprecated
    */
   transformNextResultCheck?: TransformNextResultCheck;
+  transformNextBeforeCheck?: TransformNextBeforeCheck;
 };
-export type Check = (ctx: Ctx, index: number) => void | ResultCheck;
+export type Check = (
+  ctx: Ctx,
+  index: number,
+  char: string,
+) => void | ResultCheck;
 
 export type CharOption = { check?: Check };
 
@@ -62,46 +77,70 @@ const createCloseBlockOptions = (name: string): CharOption => ({
   },
 });
 
-/** @experimental */
-const createQuoteOptions = (name: string): CharOption => ({
-  check: (ctx) => {
-    if (ctx.splitBlocksKeys.has(name)) {
-      ctx.splitBlocksKeys.delete(name);
-    } else {
-      ctx.splitBlocksKeys.add(name);
-    }
-  },
-});
+const createQuoteOptions = (name: string): CharOption => {
+  const escapeSymbol = "\\";
+  return {
+    check: (ctx) => {
+      if (ctx.splitBlocksKeys.has(name)) {
+        ctx.splitBlocksKeys.delete(name);
+        return {};
+      }
 
-export const defaultSplitters = [" "];
-export const defaultEscapes = ["\\"];
-export const defaultBlocks = [
-  ["{", "}"],
-  ["[", "]"],
-  ["(", ")"],
-];
-export const defaultQuotes: string[] = []; // ["'", '"'];
+      ctx.splitBlocksKeys.add(name);
+
+      const transformNextBeforeCheck: TransformNextBeforeCheck = (
+        next,
+        index,
+        char,
+      ) => {
+        if (char === escapeSymbol) {
+          return {
+            transformNextBeforeCheck: () => {
+              return { transformNextBeforeCheck };
+            },
+          };
+        }
+        if (char !== name) return { transformNextBeforeCheck };
+        return next();
+      };
+
+      return {
+        transformNextBeforeCheck,
+      };
+    },
+  };
+};
+
+export const defaultOptions: Required<Options> = {
+  splitters: [" "],
+  escapes: ["\\"],
+  brackets: [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"],
+  ],
+  quotes: ["'", '"'],
+};
 
 type Options = {
   splitters?: string[];
   escapes?: string[];
   brackets?: [string, string][];
-  /** @experimental */
   quotes?: string[];
 };
 
 function* splitString(input: string, options?: Options) {
-  const splitters = options?.splitters ?? defaultSplitters;
-  const escapes = options?.escapes ?? defaultEscapes;
-  const blocks = options?.brackets ?? defaultBlocks;
-  const quotes = options?.quotes ?? defaultQuotes;
+  const splitters = options?.splitters ?? defaultOptions.splitters;
+  const escapes = options?.escapes ?? defaultOptions.escapes;
+  const blocks = options?.brackets ?? defaultOptions.brackets;
+  const quotes = options?.quotes ?? defaultOptions.quotes;
 
   const charOptions = {
     ...Object.fromEntries(
-      splitters.map((splitter) => [splitter, splitterOption]),
+      escapes?.map((escape) => [escape, escapeOptions]) ?? [],
     ),
     ...Object.fromEntries(
-      escapes?.map((escape) => [escape, escapeOptions]) ?? [],
+      splitters.map((splitter) => [splitter, splitterOption]),
     ),
     ...Object.fromEntries(
       blocks
@@ -122,7 +161,11 @@ function* splitString(input: string, options?: Options) {
   let index = -1;
   let startFrom = 0;
   const ctx: Ctx = new Ctx();
-  let nextTransformResultCheck: TransformNextResultCheck | null = null;
+  let nextTransformNextResultCheck: TransformNextResultCheck | null = null;
+  let nextTransformNextBeforeCheckPass: TransformNextBeforeCheck = (next) =>
+    next();
+  let nextTransformNextBeforeCheck: TransformNextBeforeCheck =
+    nextTransformNextBeforeCheckPass;
 
   const at = (i: number) => input[i] ?? null;
 
@@ -134,15 +177,25 @@ function* splitString(input: string, options?: Options) {
     if (char === null) break;
 
     const transformResultCheck: TransformNextResultCheck =
-      nextTransformResultCheck ?? ((a) => a);
+      nextTransformNextResultCheck ?? ((a) => a);
 
-    const checking = transformResultCheck(
-      charType?.check?.(ctx, index) ?? {},
+    const checking = nextTransformNextBeforeCheck(
+      () =>
+        transformResultCheck(
+          charType?.check?.(ctx, index, char) ?? {},
+          index,
+          char,
+        ),
       index,
+      char,
+      input,
     );
+
     const split = checking?.split ?? false;
     const transformNextChar = checking?.transformNextResultCheck;
-    nextTransformResultCheck = transformNextChar ?? null;
+    nextTransformNextResultCheck = transformNextChar ?? null;
+    nextTransformNextBeforeCheck =
+      checking.transformNextBeforeCheck ?? nextTransformNextBeforeCheckPass;
 
     if (split && !ctx.isSplitBlocked()) {
       yield input.slice(startFrom, index);
