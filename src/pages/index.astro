@@ -1,5 +1,6 @@
 ---
 import InputSplitg from "../components/input-splitg.astro";
+import { splitgPackage } from "../scripts/splitg-package";
 ---
 
 <html lang="en">
@@ -8,7 +9,7 @@ import InputSplitg from "../components/input-splitg.astro";
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
-    <title>Demo splitg</title>
+    <title>Demo splitg {`(${splitgPackage.version})`}</title>
   </head>
   <body>
     <div class="">
@@ -21,6 +22,9 @@ import InputSplitg from "../components/input-splitg.astro";
         </div>
       </body>
       <footer>
+        <div class="w-full max-w-screen-md mx-auto px-2 py-4 text-black/80 text-sm">
+          See the source here <a href="https://github.com/JonDotsoy/splitg">github.com/JonDotsoy/splitg</a>
+        </div>
         <!-- <footer>footer</footer> -->
       </footer>
     </div>
