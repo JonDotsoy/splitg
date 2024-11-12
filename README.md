@@ -6,18 +6,25 @@ Splits a string into an array of strings, handling spaces and quotes correctly.
 splitg(`abc def g`); // => [`abc`, `def`, `g`]
 splitg(`run -c "command to run"`); // => [`run`, `-c`, `"command to run"`]
 splitg(`this is a json { "name": "ok" } with a property name`); // => [`this`, `is`, `a`, `json`, `{ "name": "ok" }`, `with`, `a`, `property`, `name`]
+
+// Complex sample:
+splitg(
+  `{ "name": "freed" }\n[ "name", "freed" ]\n[ [ "name", "freed" ],\n[ "age", 44 ] ]`,
+  "\n",
+);
+// => [
+//   '{ "name": "freed" }',
+//   '[ "name", "freed" ]',
+//   '[ [ "name", "freed" ],\n[ "age", 44 ] ]',
+// ]
 ```
 
 ## Usage
 
-Install the package using npm, bun, pnpm or yarn:
+Install the package [@jondotsoy/splitg](https://www.npmjs.com/package/@jondotsoy/splitg):
 
 ```bash
 npm add splitg
-```
-
-```ts
-import splitg from "splitg";
 ```
 
 ### Custom Delimiters
@@ -37,7 +44,7 @@ splitg(`abc~def~g`, "~"); // => [`abc`, `def`, `g`]
 **Example:**
 
 ```ts
-splitg(`abc <def ghi> [jkl mno]`, undefined, {
+splitg(`abc <def ghi> [jkl mno]`, {
   brackets: [["<", ">"]],
 }); // => [`abc`, `<def ghi>`, `[jkl`, `mno]`]
 ```
@@ -47,7 +54,11 @@ splitg(`abc <def ghi> [jkl mno]`, undefined, {
 **Example:**
 
 ```ts
-splitg(`abc~def ghi jkl~mno`, undefined, {
+splitg(`abc~def ghi jkl~mno`, {
   splitters: ["~", " "],
 }); // => [`abc`, `def`, `ghi`, `jkl`, `mno]`]
 ```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.

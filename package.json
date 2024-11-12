@@ -34,5 +34,12 @@
   },
   "files": [
     "lib"
+  ],
+  "keywords": [
+    "split",
+    "string",
+    "text",
+    "utility",
+    "helper"
   ]
 }
