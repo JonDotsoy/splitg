@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.1](https://github.com/JonDotsoy/splitg/compare/splitg-v0.4.0...splitg-v0.4.1) (2024-11-12)
+
+
+### Bug Fixes
+
+* change brakes delimiter strategy ([d24e541](https://github.com/JonDotsoy/splitg/commit/d24e5415c4001d4033b4eb92595fa3ca0ac8ab1a))
+* upgrade brakes strategy ([#7](https://github.com/JonDotsoy/splitg/issues/7)) ([41468f7](https://github.com/JonDotsoy/splitg/commit/41468f744c2cf11930668b1ff5f4e477bf715f1a))
+
 ## [0.4.0](https://github.com/JonDotsoy/splitg/compare/splitg-v0.3.1...splitg-v0.4.0) (2024-11-12)
 
 
