@@ -274,4 +274,17 @@ describe("edge cases", () => {
       ),
     ).toMatchSnapshot();
   });
+
+  it("splits a string with multiple nested brackets and json objects", () => {
+    expect(
+      splitg(
+        `{ "name": "freed" }\n[ "name", "freed" ]\n[ [ "name", "freed" ],\n[ "age", 44 ] ]`,
+        "\n",
+      ),
+    ).toEqual([
+      '{ "name": "freed" }',
+      '[ "name", "freed" ]',
+      '[ [ "name", "freed" ],\n[ "age", 44 ] ]',
+    ]);
+  });
 });
