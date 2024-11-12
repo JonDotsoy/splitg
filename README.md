@@ -19,6 +19,8 @@ splitg(
 // ]
 ```
 
+Try it here (https://jondotsoy.github.io/splitg/)[https://jondotsoy.github.io/splitg/]
+
 ## Usage
 
 Install the package [@jondotsoy/splitg](https://www.npmjs.com/package/@jondotsoy/splitg):
