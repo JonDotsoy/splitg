@@ -209,4 +209,69 @@ describe("edge cases", () => {
       "f",
     ]);
   });
+  it("splits a string with multiple json objects", () => {
+    expect(
+      splitg(
+        [
+          JSON.stringify({
+            employee: {
+              name: "sonoo",
+              salary: 56000,
+              married: true,
+            },
+          }),
+
+          JSON.stringify(
+            [
+              "Sunday",
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+            ],
+            null,
+            2,
+          ),
+
+          JSON.stringify(
+            [
+              { name: "Ram", email: "Ram@gmail.com" },
+              { name: "Bob", email: "bob32@gmail.com" },
+            ],
+            null,
+            2,
+          ),
+
+          JSON.stringify({
+            employees: [
+              { name: "Shyam", email: "shyamjaiswal@gmail.com" },
+              { name: "Bob", email: "bob32@gmail.com" },
+              { name: "Jai", email: "jai87@gmail.com" },
+            ],
+          }),
+
+          JSON.stringify(
+            {
+              menu: {
+                id: "file",
+                value: "File",
+                popup: {
+                  menuitem: [
+                    { value: "New", onclick: "CreateDoc()" },
+                    { value: "Open", onclick: "OpenDoc()" },
+                    { value: "Save", onclick: "SaveDoc()" },
+                  ],
+                },
+              },
+            },
+            null,
+            2,
+          ),
+        ].join("\n"),
+        "\n",
+      ),
+    ).toMatchSnapshot();
+  });
 });
