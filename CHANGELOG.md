@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.2](https://github.com/JonDotsoy/splitg/compare/splitg-v0.4.1...splitg-v0.4.2) (2024-11-12)
+
+
+### Bug Fixes
+
+* upgrade options to escape characters ([3612173](https://github.com/JonDotsoy/splitg/commit/36121731d021f6a49f2d3766ec14a58fe681be36))
+
+
+### Performance Improvements
+
+* add support to options false and single ([3612173](https://github.com/JonDotsoy/splitg/commit/36121731d021f6a49f2d3766ec14a58fe681be36))
+
 ## [0.4.1](https://github.com/JonDotsoy/splitg/compare/splitg-v0.4.0...splitg-v0.4.1) (2024-11-12)
 
 
