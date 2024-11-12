@@ -140,3 +140,73 @@ describe("quotes", () => {
       "e",
     ]));
 });
+
+describe("edge cases", () => {
+  it("should not split if splitters is false", () => {
+    expect(splitg("a b c d e f", { splitters: false })).toEqual([
+      "a b c d e f",
+    ]);
+  });
+
+  it("should handle escapes correctly", () => {
+    expect(splitg("a b - c - d e f", { escapes: ["-"] })).toEqual([
+      "a",
+      "b",
+      "- c",
+      "- d",
+      "e",
+      "f",
+    ]);
+  });
+
+  it("should handle escapes correctly (string)", () => {
+    expect(splitg("a b - c - d e f", { escapes: "-" })).toEqual([
+      "a",
+      "b",
+      "- c",
+      "- d",
+      "e",
+      "f",
+    ]);
+  });
+
+  it("should handle escaped quotes correctly", () => {
+    expect(splitg('a "b \\" d" e f', { escapes: ["-"] })).toEqual([
+      "a",
+      '"b \\"',
+      'd" e f',
+    ]);
+  });
+
+  it("should handle escaped quotes and splitters correctly", () => {
+    expect(splitg('a "b -" d" e f', { escapes: ["-"] })).toEqual([
+      "a",
+      '"b -" d"',
+      "e",
+      "f",
+    ]);
+  });
+
+  it("should handle multiple splitters correctly", () => {
+    expect(splitg("a b,c,d e f", { splitters: [",", " "] })).toEqual([
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+      "f",
+    ]);
+  });
+
+  it("should handle brackets correctly if brackets is false", () => {
+    expect(splitg("a [b c d e ] f", { brackets: false })).toEqual([
+      "a",
+      "[b",
+      "c",
+      "d",
+      "e",
+      "]",
+      "f",
+    ]);
+  });
+});

@@ -83,7 +83,7 @@ const createCloseBlockOptions = (
   },
 });
 
-const createQuoteOptions = (name: string): CharOption => {
+const createQuoteOptions = (name: string, escapes: string[]): CharOption => {
   const escapeSymbol = "\\";
   return {
     check: (ctx) => {
@@ -99,7 +99,7 @@ const createQuoteOptions = (name: string): CharOption => {
         index,
         char,
       ) => {
-        if (char === escapeSymbol) {
+        if (escapes.includes(char)) {
           return {
             transformNextBeforeCheck: () => {
               return { transformNextBeforeCheck };
@@ -135,11 +135,28 @@ type Options = {
   quotes?: string[];
 };
 
-function* splitString(input: string, options?: Options) {
-  const splitters = options?.splitters ?? defaultOptions.splitters;
-  const escapes = options?.escapes ?? defaultOptions.escapes;
-  const blocks = options?.brackets ?? defaultOptions.brackets;
-  const quotes = options?.quotes ?? defaultOptions.quotes;
+type PropsFalsables<T> = T extends {}
+  ? { [K in keyof T]: T[K] | false }
+  : never;
+type SingleOption<T> = T extends (infer R)[] ? T | R : T;
+type SingleOptions<T> = T extends {}
+  ? { [K in keyof T]: SingleOption<T[K]> }
+  : never;
+
+type OptionsFalsable = PropsFalsables<SingleOptions<Options>>;
+
+const unFalsable = <T>(prop: T) =>
+  prop === false ? undefined : (prop as Exclude<T, false>);
+const toArray = <T>(value: T): T extends any[] ? T : T[] =>
+  Array.isArray(value) ? value : ([value] as any);
+
+function* splitString(input: string, options?: OptionsFalsable) {
+  const v = <T>(v: T) => (v === false ? [] : (v as Exclude<T, false>));
+
+  const splitters = toArray(v(options?.splitters) ?? defaultOptions.splitters);
+  const escapes = toArray(v(options?.escapes) ?? defaultOptions.escapes);
+  const blocks = toArray(v(options?.brackets) ?? defaultOptions.brackets);
+  const quotes = toArray(v(options?.quotes) ?? defaultOptions.quotes);
 
   const charOptions = {
     ...Object.fromEntries(
@@ -159,7 +176,7 @@ function* splitString(input: string, options?: Options) {
     ...Object.fromEntries(
       quotes.map((quoteSymbol) => [
         quoteSymbol,
-        createQuoteOptions(quoteSymbol),
+        createQuoteOptions(quoteSymbol, escapes),
       ]),
     ),
   };
@@ -167,6 +184,7 @@ function* splitString(input: string, options?: Options) {
   let index = -1;
   let startFrom = 0;
   const ctx: Ctx = new Ctx();
+  /** @deprecated */
   let nextTransformNextResultCheck: TransformNextResultCheck | null = null;
   let nextTransformNextBeforeCheckPass: TransformNextBeforeCheck = (next) =>
     next();
@@ -179,9 +197,11 @@ function* splitString(input: string, options?: Options) {
     index++;
     const char = at(index);
     const charType: CharOption | null = charOptions[char] ?? null;
+    // console.log("🚀 ~ function*splitString ~ ", "char:", char, "charType:", charType)
 
     if (char === null) break;
 
+    /** @deprecated */
     const transformResultCheck: TransformNextResultCheck =
       nextTransformNextResultCheck ?? ((a) => a);
 
@@ -198,6 +218,7 @@ function* splitString(input: string, options?: Options) {
     );
 
     const split = checking?.split ?? false;
+    /** @deprecated */
     const transformNextChar = checking?.transformNextResultCheck;
     nextTransformNextResultCheck = transformNextChar ?? null;
     nextTransformNextBeforeCheck =
@@ -214,18 +235,18 @@ function* splitString(input: string, options?: Options) {
 
 type SplitgOptions =
   | []
-  | [splitterOrOptions?: string | Options]
-  | [splitter?: string, options?: Options];
+  | [splitterOrOptions?: string | OptionsFalsable | false]
+  | [splitter?: string | false, options?: OptionsFalsable];
 
 const parseSplitgOptions = (
   ...options: SplitgOptions
-): { splitter?: string; options?: Options } => {
+): { splitter?: string; options?: OptionsFalsable } => {
   const [splitterOrOptions, optionsValue] = options;
   if (typeof splitterOrOptions === "object")
     return { options: splitterOrOptions };
   if (typeof optionsValue === "object")
     return {
-      splitter: splitterOrOptions,
+      splitter: unFalsable(splitterOrOptions),
       options: optionsValue,
     };
   if (typeof splitterOrOptions === "string")
@@ -242,7 +263,7 @@ export function splitgOptions(input: string, ...options: SplitgOptions) {
     options: {
       ...optionsValue,
       splitters: splitter
-        ? [splitter, ...(optionsValue?.splitters ?? [])]
+        ? [splitter, ...(unFalsable(optionsValue?.splitters) ?? [])]
         : optionsValue?.splitters,
     } as Options,
   };
