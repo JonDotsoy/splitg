@@ -41,5 +41,9 @@
     "text",
     "utility",
     "helper"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JonDotsoy/splitg.git"
+  }
 }
