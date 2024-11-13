@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.7](https://github.com/JonDotsoy/splitg/compare/splitg-v0.4.6...splitg-v0.4.7) (2024-11-13)
+
+
+### Miscellaneous Chores
+
+* release 0.4.7 ([48b181a](https://github.com/JonDotsoy/splitg/commit/48b181a2b31216f26a0a1d148d826752ac84fee3))
+
 ## [0.4.6](https://github.com/JonDotsoy/splitg/compare/splitg-v0.4.5...splitg-v0.4.6) (2024-11-12)
 
 
