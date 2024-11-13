@@ -26,7 +26,7 @@ Try it here [https://jondotsoy.github.io/splitg/](https://jondotsoy.github.io/sp
 Install the package [@jondotsoy/splitg](https://www.npmjs.com/package/@jondotsoy/splitg):
 
 ```bash
-npm add splitg
+npm i @jondotsoy/splitg
 ```
 
 ### Custom Delimiters
