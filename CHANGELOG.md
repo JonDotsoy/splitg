@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.8](https://github.com/JonDotsoy/splitg/compare/splitg-v0.4.7...splitg-v0.4.8) (2024-11-13)
+
+
+### Bug Fixes
+
+* actualizar README.md ([1b9a24e](https://github.com/JonDotsoy/splitg/commit/1b9a24e943ea90ee64ff1ec8577a5a766a8a2428))
+* actualizar README.md ([c4d0f66](https://github.com/JonDotsoy/splitg/commit/c4d0f66d3b08be0ec6b76f1408bd65cec6c44c70))
+
 ## [0.4.7](https://github.com/JonDotsoy/splitg/compare/splitg-v0.4.6...splitg-v0.4.7) (2024-11-13)
 
 
