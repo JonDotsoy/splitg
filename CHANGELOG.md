@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/JonDotsoy/splitg/compare/splitg-v0.5.0...splitg-v0.6.0) (2024-11-19)
+
+
+### Features
+
+* add parse paths utilities ([5133c04](https://github.com/JonDotsoy/splitg/commit/5133c04267a6de99e0a0abc23fa61e93a19da119))
+
 ## [0.5.0](https://github.com/JonDotsoy/splitg/compare/splitg-v0.4.8...splitg-v0.5.0) (2024-11-19)
 
 
