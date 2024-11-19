@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/JonDotsoy/splitg/compare/splitg-v0.4.8...splitg-v0.5.0) (2024-11-19)
+
+
+### Features
+
+* add support to span ([6933396](https://github.com/JonDotsoy/splitg/commit/693339607b2fe09291ba71d9cf1e855a1220480c))
+
 ## [0.4.8](https://github.com/JonDotsoy/splitg/compare/splitg-v0.4.7...splitg-v0.4.8) (2024-11-13)
 
 
