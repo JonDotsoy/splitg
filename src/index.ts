@@ -1,6 +1,15 @@
+type Span = {
+  name: string;
+  start: number;
+  end: number;
+}
+
 class Ctx {
-  bracketsDepths: string[] = [];
+  bracketsDepths: { name: string, pos: number }[] = [];
   blocksKeys = new Set<string>();
+  quoteOpen: { name: string, pos: number } | null = null;
+  spans = new Set<Span>();
+
   isSplitBlocked() {
     return this.blocksKeys.size > 0 || this.bracketsDepths.length;
   }
@@ -24,6 +33,10 @@ export type ResultCheck = {
    * Cut here
    */
   split?: boolean;
+  /**
+   * End block
+   */
+  endBlock?: boolean;
   /**
    * Transform the next char
    * @deprecated
@@ -64,8 +77,8 @@ const createOpenBlockOptions = (
   _open: string,
   _close: string,
 ): CharOption => ({
-  check(ctx) {
-    ctx.bracketsDepths.push(name);
+  check(ctx, pos) {
+    ctx.bracketsDepths.push({ name, pos: pos });
   },
 });
 
@@ -74,25 +87,44 @@ const createCloseBlockOptions = (
   _open: string,
   _close: string,
 ): CharOption => ({
-  check(ctx) {
+  check(ctx, i, char) {
     const index = ctx.bracketsDepths.findLastIndex(
-      (storeName) => storeName === name,
+      (storeName) => storeName.name === name,
     );
+    const bracketsDepth = ctx.bracketsDepths.at(index)!;
     if (index === -1) return;
     ctx.bracketsDepths = ctx.bracketsDepths.slice(0, index);
+
+    const span: Span = {
+      name,
+      start: bracketsDepth.pos,
+      end: i,
+    };
+
+    ctx.spans.add(span);
   },
 });
 
 const createQuoteOptions = (name: string, escapes: string[]): CharOption => {
   const escapeSymbol = "\\";
   return {
-    check: (ctx) => {
+    check: (ctx, i, char) => {
       if (ctx.blocksKeys.has(name)) {
         ctx.blocksKeys.delete(name);
+        if (ctx.quoteOpen) {
+          const span: Span = {
+            name,
+            start: ctx.quoteOpen.pos,
+            end: i,
+          }
+          ctx.spans.add(span);
+        }
+        ctx.quoteOpen = null;
         return {};
       }
 
       ctx.blocksKeys.add(name);
+      ctx.quoteOpen = { name, pos: i };
 
       const transformNextBeforeCheck: TransformNextBeforeCheck = (
         next,
@@ -150,7 +182,7 @@ const unFalsable = <T>(prop: T) =>
 const toArray = <T>(value: T): T extends any[] ? T : T[] =>
   Array.isArray(value) ? value : ([value] as any);
 
-function* splitString(input: string, options?: OptionsFalsable) {
+function* splitString(input: string, options?: OptionsFalsable, extraOptions?: { onCtx: (ctx: Ctx) => void }) {
   const v = <T>(v: T) => (v === false ? [] : (v as Exclude<T, false>));
 
   const splitters = toArray(v(options?.splitters) ?? defaultOptions.splitters);
@@ -184,6 +216,7 @@ function* splitString(input: string, options?: OptionsFalsable) {
   let index = -1;
   let startFrom = 0;
   const ctx: Ctx = new Ctx();
+  extraOptions?.onCtx(ctx);
   /** @deprecated */
   let nextTransformNextResultCheck: TransformNextResultCheck | null = null;
   let nextTransformNextBeforeCheckPass: TransformNextBeforeCheck = (next) =>
@@ -276,6 +309,23 @@ export function splitg(input: string, ...options: SplitgOptions) {
   );
 
   return Array.from(splitString(inputValue, optionsValue));
+}
+
+splitg.spans = (input: string, ...options: SplitgOptions) => {
+  const { input: inputValue, options: optionsValue } = splitgOptions(
+    input,
+    ...options,
+  );
+
+  let spans: Set<Span> | null = null;
+
+  Array.from(splitString(inputValue, optionsValue, {
+    onCtx: ctx => {
+      spans = ctx.spans;
+    }
+  }));
+
+  return spans!;
 }
 
 export default splitg;

@@ -53,3 +53,83 @@ exports[`edge cases splits a string with multiple json objects 1`] = `
 ,
 ]
 `;
+
+exports[`edge cases splits a string with multiple nested brackets and json objects and spans 1`] = `
+[
+  {
+    "end": 7,
+    "name": """,
+    "start": 2,
+  },
+  {
+    "end": 16,
+    "name": """,
+    "start": 10,
+  },
+  {
+    "end": 18,
+    "name": "{}",
+    "start": 0,
+  },
+  {
+    "end": 27,
+    "name": """,
+    "start": 22,
+  },
+  {
+    "end": 36,
+    "name": """,
+    "start": 30,
+  },
+  {
+    "end": 38,
+    "name": "[]",
+    "start": 20,
+  },
+  {
+    "end": 49,
+    "name": """,
+    "start": 44,
+  },
+  {
+    "end": 58,
+    "name": """,
+    "start": 52,
+  },
+  {
+    "end": 65,
+    "name": """,
+    "start": 63,
+  },
+  {
+    "end": 70,
+    "name": """,
+    "start": 68,
+  },
+  {
+    "end": 72,
+    "name": "{}",
+    "start": 61,
+  },
+  {
+    "end": 74,
+    "name": "[]",
+    "start": 42,
+  },
+  {
+    "end": 83,
+    "name": """,
+    "start": 79,
+  },
+  {
+    "end": 89,
+    "name": "[]",
+    "start": 77,
+  },
+  {
+    "end": 91,
+    "name": "[]",
+    "start": 40,
+  },
+]
+`;
