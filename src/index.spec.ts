@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { splitg, splitgOptions } from ".";
+import { paths, splitg, splitgOptions } from ".";
 
 it("splits a string by spaces", () =>
   expect(splitg(`abc def g`)).toEqual(["abc", "def", "g"]));
@@ -296,4 +296,25 @@ describe("edge cases", () => {
       ),
     ]).toMatchSnapshot();
   });
+});
+
+describe("paths", () => {
+  const examples = [
+    ["a", "b", "c"],
+    ["a", "(b", "c)", "e"],
+    ["a", "b.c", "d"],
+    ["a", 'b"c', "d"],
+    ["a", 'b"c.d', "e"],
+    ["a ", 'b"c.d', "e"],
+    ["a ", "b'd", "e"],
+    ["a ", "b\\d", "e"],
+  ];
+
+  for (const example of examples)
+    it(`should stringify and parse ${JSON.stringify(example)} correctly`, () => {
+      expect(splitg.paths.stringify(example)).toMatchSnapshot();
+      expect(example).toEqual(
+        splitg.paths.parse(splitg.paths.stringify(example)),
+      );
+    });
 });

@@ -334,4 +334,37 @@ splitg.spans = (input: string, ...options: SplitgOptions) => {
   return spans!;
 };
 
+export namespace paths {
+  const quote = '"';
+
+  const options: OptionsFalsable = {
+    brackets: [],
+    escapes: [`\\`],
+    quotes: [`"`],
+    splitters: [`.`],
+  };
+
+  export const stringify = (parts: (string | number)[]) => {
+    return parts
+      .map((part) => {
+        // return part.toString().replace(/(\.|\")/g, '\\$1')
+        const partString = part.toString();
+        return /\W/.test(partString) ? JSON.stringify(partString) : partString;
+      })
+      .join(".");
+  };
+
+  export const parse = (value: string) => {
+    return splitg(value, options).map((part) => {
+      try {
+        return JSON.parse(part);
+      } catch {
+        return part;
+      }
+    });
+  };
+}
+
+splitg.paths = paths;
+
 export default splitg;

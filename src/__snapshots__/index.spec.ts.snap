@@ -133,3 +133,19 @@ exports[`edge cases splits a string with multiple nested brackets and json objec
   },
 ]
 `;
+
+exports[`paths should stringify and parse ["a","b","c"] correctly 1`] = `"a.b.c"`;
+
+exports[`paths should stringify and parse ["a","(b","c)","e"] correctly 1`] = `"a."(b"."c)".e"`;
+
+exports[`paths should stringify and parse ["a","b.c","d"] correctly 1`] = `"a."b.c".d"`;
+
+exports[`paths should stringify and parse ["a","b\"c","d"] correctly 1`] = `"a."b\"c".d"`;
+
+exports[`paths should stringify and parse ["a","b\"c.d","e"] correctly 1`] = `"a."b\"c.d".e"`;
+
+exports[`paths should stringify and parse ["a ","b\"c.d","e"] correctly 1`] = `""a "."b\"c.d".e"`;
+
+exports[`paths should stringify and parse ["a ","b'd","e"] correctly 1`] = `""a "."b'd".e"`;
+
+exports[`paths should stringify and parse ["a ","b\\d","e"] correctly 1`] = `""a "."b\\d".e"`;
