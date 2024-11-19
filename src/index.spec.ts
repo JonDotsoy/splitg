@@ -289,11 +289,11 @@ describe("edge cases", () => {
   });
 
   it("splits a string with multiple nested brackets and json objects and spans", () => {
-    expect(
-      [...splitg.spans(
+    expect([
+      ...splitg.spans(
         `{ "name": "freed" }\n[ "name", "freed" ]\n[ [ "name", "freed", { "a": "b" } ],\n[ "age", 44 ] ]`,
         "\n",
-      )]
-    ).toMatchSnapshot()
+      ),
+    ]).toMatchSnapshot();
   });
 });

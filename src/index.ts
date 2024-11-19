@@ -2,12 +2,12 @@ type Span = {
   name: string;
   start: number;
   end: number;
-}
+};
 
 class Ctx {
-  bracketsDepths: { name: string, pos: number }[] = [];
+  bracketsDepths: { name: string; pos: number }[] = [];
   blocksKeys = new Set<string>();
-  quoteOpen: { name: string, pos: number } | null = null;
+  quoteOpen: { name: string; pos: number } | null = null;
   spans = new Set<Span>();
 
   isSplitBlocked() {
@@ -116,7 +116,7 @@ const createQuoteOptions = (name: string, escapes: string[]): CharOption => {
             name,
             start: ctx.quoteOpen.pos,
             end: i,
-          }
+          };
           ctx.spans.add(span);
         }
         ctx.quoteOpen = null;
@@ -182,7 +182,11 @@ const unFalsable = <T>(prop: T) =>
 const toArray = <T>(value: T): T extends any[] ? T : T[] =>
   Array.isArray(value) ? value : ([value] as any);
 
-function* splitString(input: string, options?: OptionsFalsable, extraOptions?: { onCtx: (ctx: Ctx) => void }) {
+function* splitString(
+  input: string,
+  options?: OptionsFalsable,
+  extraOptions?: { onCtx: (ctx: Ctx) => void },
+) {
   const v = <T>(v: T) => (v === false ? [] : (v as Exclude<T, false>));
 
   const splitters = toArray(v(options?.splitters) ?? defaultOptions.splitters);
@@ -319,13 +323,15 @@ splitg.spans = (input: string, ...options: SplitgOptions) => {
 
   let spans: Set<Span> | null = null;
 
-  Array.from(splitString(inputValue, optionsValue, {
-    onCtx: ctx => {
-      spans = ctx.spans;
-    }
-  }));
+  Array.from(
+    splitString(inputValue, optionsValue, {
+      onCtx: (ctx) => {
+        spans = ctx.spans;
+      },
+    }),
+  );
 
   return spans!;
-}
+};
 
 export default splitg;
